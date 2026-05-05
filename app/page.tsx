@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { projects } from "@/lib/projects";
+import emailjs from "@emailjs/browser";
 
 const Hero3D = dynamic(() => import("@/components/Hero3D"), { ssr: false });
 const ProjectScene = dynamic(() => import("@/components/ProjectScene"), { ssr: false });
@@ -53,16 +54,9 @@ const certifications = [
 export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>(projects[0].id);
   const [selectedCertification, setSelectedCertification] = useState<string | null>(null);
-  const handleResumeDownload = () => {
-    const link = document.createElement("a");
-    link.href = "/resume.pdf";
-    link.download = "Paryag-Guglani-Resume.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
   const [uploadedCertificates, setUploadedCertificates] = useState<Array<{ name: string; type: string; url: string }>>([]);
   const [selectedUploadedFileUrl, setSelectedUploadedFileUrl] = useState<string | null>(null);
+  const [formStatus, setFormStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const selectedProject = projects.find((project) => project.id === selectedProjectId) || projects[0];
   const activeCertification = certifications.find((cert) => cert.title === selectedCertification) || null;
   const activeUploadedFile = uploadedCertificates.find((file) => file.url === selectedUploadedFileUrl) || null;
@@ -86,6 +80,36 @@ export default function Home() {
     setUploadedCertificates((prev) => [...prev, ...newFiles]);
     setSelectedUploadedFileUrl(newFiles[0].url);
     event.target.value = "";
+  };
+
+  const handleContactSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormStatus("sending");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const message = formData.get("message") as string;
+
+    try {
+      await emailjs.send(
+        "service_zujymz7",
+        "template_4z1calm",
+        {
+          from_name: name,
+          from_email: email,
+          message: message,
+          to_email: "guglaniparyag15@gmail.com",
+        },
+        "-QxcCG-J_iHrS62PD"
+      );
+      setFormStatus("success");
+      form.reset();
+    } catch (error) {
+      console.error("Email send failed:", error);
+      setFormStatus("error");
+    }
   };
 
   return (
@@ -148,7 +172,7 @@ export default function Home() {
               <a href="https://github.com/paryagguglani" target="_blank" rel="noreferrer" className="rounded-3xl bg-slate-900/80 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-800">
                 GitHub
               </a>
-              <a href="https://linkedin.com/in/paryagguglani" target="_blank" rel="noreferrer" className="rounded-3xl bg-slate-900/80 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-800">
+              <a href="https://www.linkedin.com/in/paryag-guglani-672425291/" target="_blank" rel="noreferrer" className="rounded-3xl bg-slate-900/80 px-4 py-3 text-sm font-semibold text-slate-100 transition hover:bg-slate-800">
                 LinkedIn
               </a>
             </div>
@@ -480,34 +504,44 @@ export default function Home() {
                 </div>
                 <div className="rounded-3xl bg-slate-900/75 p-5 ring-1 ring-white/5">
                   <p className="text-sm uppercase tracking-[0.3em] text-slate-400">LinkedIn</p>
-                  <a href="https://linkedin.com/in/paryagguglani" target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center justify-center rounded-3xl bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-700">
+                  <a href="https://www.linkedin.com/in/paryag-guglani-672425291/" target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center justify-center rounded-3xl bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-700">
                     LinkedIn
                   </a>
                 </div>
               </div>
             </div>
             <div className="rounded-[32px] border border-white/10 bg-slate-950/80 p-8 shadow-2xl shadow-slate-950/10 ring-1 ring-white/5">
-              <form className="space-y-5" onSubmit={(event) => event.preventDefault()}>
+              <form className="space-y-5" onSubmit={handleContactSubmit}>
                 <div>
                   <label htmlFor="name" className="block text-sm font-semibold text-slate-200">
                     Name
                   </label>
-                  <input id="name" type="text" placeholder="Your name" className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:border-cyan-400 focus:ring-cyan-400/30" />
+                  <input id="name" name="name" type="text" placeholder="Your name" required className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:border-cyan-400 focus:ring-cyan-400/30" />
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-semibold text-slate-200">
                     Email
                   </label>
-                  <input id="email" type="email" placeholder="your.email@example.com" className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:border-cyan-400 focus:ring-cyan-400/30" />
+                  <input id="email" name="email" type="email" placeholder="your.email@example.com" required className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:border-cyan-400 focus:ring-cyan-400/30" />
                 </div>
                 <div>
                   <label htmlFor="message" className="block text-sm font-semibold text-slate-200">
                     Message
                   </label>
-                  <textarea id="message" rows={5} placeholder="Tell me about your project or idea..." className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:border-cyan-400 focus:ring-cyan-400/30" />
+                  <textarea id="message" name="message" rows={5} placeholder="Tell me about your project or idea..." required className="mt-3 w-full rounded-3xl border border-white/10 bg-slate-900/80 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:border-cyan-400 focus:ring-cyan-400/30" />
                 </div>
-                <button type="submit" className="inline-flex h-12 items-center justify-center rounded-3xl bg-cyan-500 px-5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400">
-                  Send message
+                {formStatus === "success" && (
+                  <p className="text-sm text-green-400">Message sent successfully! I'll get back to you soon.</p>
+                )}
+                {formStatus === "error" && (
+                  <p className="text-sm text-red-400">Failed to send message. Please try again or contact me directly.</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={formStatus === "sending"}
+                  className="inline-flex h-12 items-center justify-center rounded-3xl bg-cyan-500 px-5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {formStatus === "sending" ? "Sending..." : "Send message"}
                 </button>
               </form>
             </div>
