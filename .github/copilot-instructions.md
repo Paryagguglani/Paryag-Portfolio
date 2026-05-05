@@ -1,0 +1,8 @@
+- [x] Verify project requirements and setup.
+- [x] Scaffolded a Next.js app with TypeScript, Tailwind CSS, ESLint, and App Router.
+- [x] Implemented an interactive 3D AI Developer Workspace with React Three Fiber and Drei.
+- [x] Added personal portfolio sections: Hero, Projects, Skills, Experience, Contact.
+- [x] Included unique interactive features: mini AI chatbot, skill heatmap, live project node preview.
+- [x] Built performance optimizations with dynamic imports and Suspense for 3D visuals.
+- [x] Verified the production build with `npm run build`.
+- [x] Updated to personal portfolio theme with name, contact details, address, GitHub, LinkedIn in landing page.
