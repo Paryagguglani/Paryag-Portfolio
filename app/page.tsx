@@ -95,7 +95,7 @@ export default function Home() {
     try {
       await emailjs.send(
         "service_zujymz7",
-        "template_4z1calm",
+        "template_5chy2gn",
         {
           from_name: name,
           from_email: email,
